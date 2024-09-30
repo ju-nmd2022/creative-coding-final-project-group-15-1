@@ -7,7 +7,7 @@ function setup() {
 
 function draw() {
   background(200);
-  randomSeed(2);
+  randomSeed(1);
   translate(width / 2, height / 2 + 200);
 
   branch(100);

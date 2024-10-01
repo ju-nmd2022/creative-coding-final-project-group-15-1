@@ -10,7 +10,7 @@ function setup() {
 
 function draw() {
   background(200);
-  randomSeed(1);
+  randomSeed(6);
   translate(width / 2, height / 2 + 200);
 
   if (currentLen < maxLen) {
@@ -18,9 +18,9 @@ function draw() {
   }
   branch(currentLen);
 
-  //   if (currentLen > 30) {
-  //     leavesAppeared = true;
-  //   }
+  if (currentLen > 30) {
+    leavesAppeared = true;
+  }
 }
 
 function branch(len) {
@@ -36,21 +36,21 @@ function branch(len) {
     branch(len * random(0.7, 0.9));
   }
 
-  //   if (leavesAppeared && len < maxLen && len > 20) {
-  //     var r = 80 + random(-20, 20);
-  //     var g = 120 + random(-20, 20);
-  //     var b = 40 + random(-20, 20);
-  //     fill(r, g, b, 150);
-  //     noStroke();
+  if (leavesAppeared && len < maxLen && len <= 10) {
+    var r = 80 + random(-20, 20);
+    var g = 120 + random(-20, 20);
+    var b = 40 + random(-20, 20);
+    fill(r, g, b, 150);
+    noStroke();
 
-  //     beginShape();
-  //     for (var i = 45; i < 135; i++) {
-  //       var rad = 15;
-  //       var x = rad * cos(i);
-  //       var y = rad * sin(i);
-  //       vertex(x, y);
-  //     }
-  //     endShape(CLOSE);
-  //   }
+    beginShape();
+    for (var i = 45; i < 135; i++) {
+      var rad = 15;
+      var x = rad * cos(i);
+      var y = rad * sin(i);
+      vertex(x, y);
+    }
+    endShape(CLOSE);
+  }
   pop();
 }

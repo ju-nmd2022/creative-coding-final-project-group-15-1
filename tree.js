@@ -7,7 +7,7 @@ function setup() {
 
 function draw() {
   background(200);
-  randomSeed(1);
+  randomSeed(6);
   translate(width / 2, height / 2 + 200);
 
   branch(100);
@@ -38,12 +38,6 @@ function branch(len) {
       var y = rad * sin(i);
       vertex(x, y);
     }
-    // for (var i = 135; i > 40; i--) {
-    //   var rad = 15;
-    //   var x = rad * cos(i);
-    //   var y = rad * sin(-i) + 20;
-    //   vertex(x, y);
-    // }
     endShape(CLOSE);
   }
   pop();

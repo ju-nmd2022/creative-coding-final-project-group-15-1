@@ -5,7 +5,7 @@ let leavesAppeared = false;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  frameRate(30);
+  frameRate(60);
 }
 
 function draw() {
@@ -14,7 +14,7 @@ function draw() {
   translate(width / 2, height / 2 + 200);
 
   if (currentLen < maxLen) {
-    currentLen += 0.25;
+    currentLen += 0.05;
   }
   branch(currentLen);
 

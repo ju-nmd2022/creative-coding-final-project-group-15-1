@@ -9,7 +9,7 @@ function setup() {
   angleMode(DEGREES);
   frameRate(60);
 
-  let startButton = createButton('Start Mic');
+  let startButton = createButton("Start Mic");
   startButton.position(10, 10);
   startButton.mousePressed(startAudio);
 }
@@ -25,22 +25,25 @@ function startAudio() {
 }
 
 function draw() {
+  let vol = 0;
+
   if (started) {
-    let vol = mic.getLevel() * 50;
-
-    let bgColor = map(vol, 0, 5, 200, 0);
-
-    background(bgColor);
-  } else {
-    background(200);
+    vol = mic.getLevel() * 900; // Amplifying the mic input
   }
+
+  let bgColor = map(vol, 0, 5, 200, 0); // Background color darkens with higher volume
+  background(bgColor);
 
   randomSeed(6);
   translate(width / 2, height / 2 + 200);
 
+  // Adjust tree growth speed based on the volume level (higher volume = slower growth)
+  let growthRate = map(vol, 0, 5, 0.05, 0.01);
+
   if (currentLen < maxLen) {
-    currentLen += 0.05;
+    currentLen += growthRate; // Slowing down the growth based on volume
   }
+
   branch(currentLen);
 
   if (currentLen > 30) {
@@ -61,18 +64,19 @@ function branch(len) {
     branch(len * random(0.7, 0.9));
   }
 
+  // Drawing leaves when leavesAppear is true and the branch is small
   if (leavesAppeared && len < maxLen && len <= 10) {
-    var r = 80 + random(-20, 20);
-    var g = 120 + random(-20, 20);
-    var b = 40 + random(-20, 20);
+    let r = 80 + random(-20, 20);
+    let g = 120 + random(-20, 20);
+    let b = 40 + random(-20, 20);
     fill(r, g, b, 150);
     noStroke();
 
     beginShape();
-    for (var i = 45; i < 135; i++) {
-      var rad = 15;
-      var x = rad * cos(i);
-      var y = rad * sin(i);
+    for (let i = 45; i < 135; i++) {
+      let rad = 15;
+      let x = rad * cos(i);
+      let y = rad * sin(i);
       vertex(x, y);
     }
     endShape(CLOSE);

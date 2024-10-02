@@ -1,3 +1,5 @@
+let mic;
+let started = false;
 let maxLen = 100;
 let currentLen = 0;
 let leavesAppeared = false;
@@ -6,10 +8,33 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
   frameRate(60);
+
+  let startButton = createButton('Start Mic');
+  startButton.position(10, 10);
+  startButton.mousePressed(startAudio);
+}
+
+function startAudio() {
+  if (!started) {
+    userStartAudio().then(() => {
+      mic = new p5.AudioIn();
+      mic.start();
+      started = true;
+    });
+  }
 }
 
 function draw() {
-  background(200);
+  if (started) {
+    let vol = mic.getLevel() * 50;
+
+    let bgColor = map(vol, 0, 5, 200, 0);
+
+    background(bgColor);
+  } else {
+    background(200);
+  }
+
   randomSeed(6);
   translate(width / 2, height / 2 + 200);
 

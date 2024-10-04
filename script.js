@@ -84,6 +84,9 @@ function branch(len) {
   pop();
 }
 */
+//////////////////////////////////////
+
+
 let faceapi;
 let detections = [];
 
@@ -99,12 +102,10 @@ function setup() {
     angleMode(DEGREES);
     frameRate(60);
 
-  
     video = createCapture(VIDEO);
     video.size(640, 480);
     video.hide();
 
-  
     const faceOptions = {
         withLandmarks: true,
         withExpressions: true,
@@ -113,7 +114,6 @@ function setup() {
     };
     faceapi = ml5.faceApi(video, faceOptions, faceReady);
 
-    
     let startButton = createButton("Start Mic");
     startButton.position(10, 10);
     startButton.mousePressed(startAudio);
@@ -129,11 +129,9 @@ function startAudio() {
     }
 }
 
-
 function faceReady() {
     faceapi.detect(gotFaces);
 }
-
 
 function gotFaces(error, result) {
     if (error) {
@@ -151,8 +149,21 @@ function draw() {
         vol = mic.getLevel() * 900;  
     }
 
-    let bgColor = map(vol, 0, 5, 200, 0);  
-    background(bgColor);
+    // Changing background color based on the number of detected faces
+    if (detections.length === 2) {
+        background(255,222,33); 
+        leavesAppeared = true;  
+    } else if (detections.length === 1) {
+        background(71, 100, 73);  
+        leavesAppeared = true; 
+    } else if (detections.length === 3) {
+      background(255,214,209);  
+      leavesAppeared = true; 
+    } else {
+        let bgColor = map(vol, 0, 5, 200, 0);  
+        background(bgColor);
+        leavesAppeared = false; 
+    }
 
     image(video, width - 320, height - 240, 320, 240);
 
@@ -189,12 +200,15 @@ function branch(len) {
         branch(len * random(0.7, 0.9));
     }
 
-    
+    // Changing the color of leaves based on the number of detected faces
     if (leavesAppeared && len < maxLen && len <= 10) {
-        let r = 80 + random(-20, 20);
-        let g = 120 + random(-20, 20);
-        let b = 40 + random(-20, 20);
-        fill(r, g, b, 150);
+        if (detections.length === 2) {
+            fill(255, 25, 0, 150);  
+        } else if (detections.length === 1) {
+            fill(0, 255, 0, 150);  
+        } else if (detections.length === 3) {
+          fill(255, 163, 221);  
+        } 
         noStroke();
 
         beginShape();

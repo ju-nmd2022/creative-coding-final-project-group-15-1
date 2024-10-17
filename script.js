@@ -1,3 +1,5 @@
+//The logic behind the visual system is implemented from https://youtu.be/-3HwUKsovBE?si=XKVmyXNl04A2dKCN
+//The logic behind the face detecion system is implemented from https://www.geeksforgeeks.org/how-to-implement-face-detection-with-ml5js/ 
 let detections = [];
 let video;
 let mic;
@@ -55,33 +57,30 @@ function gotFaces(error, result) {
 function draw() {
     let vol = 0;
     if (started) {
-        vol = mic.getLevel() * 500;  // Increase sensitivity for better visualization
+        vol = mic.getLevel() * 500;
     }
 
-    // Base color depending on the number of faces detected
     let baseColor;
     if (detections.length === 2) {
-        baseColor = color(255, 222, 33); // Yellowish
+        baseColor = color(255, 222, 33);
         leavesAppeared = true;
     } else if (detections.length === 1) {
-        baseColor = color(71, 100, 73);  // Greenish
+        baseColor = color(71, 100, 73);
         leavesAppeared = true;
     } else if (detections.length === 3) {
-        baseColor = color(255, 214, 209);  // Pinkish
+        baseColor = color(255, 214, 209);
         leavesAppeared = true;
     } else {
-        baseColor = color(255);  // Default white when no faces detected
+        baseColor = color(255);
         leavesAppeared = false;
     }
 
-    // Map the mic input to a range of darkening effect
-    let darkness = map(vol, 0, 100, 0, 100); // Map volume to a 0-100 range for darkening
-    let bgColor = lerpColor(baseColor, color(0), darkness / 100);  // Darken the base color based on volume
+    let darkness = map(vol, 0, 100, 0, 100);
+    let bgColor = lerpColor(baseColor, color(0), darkness / 100);
     background(bgColor);
 
     image(video, width - 320, height - 240, 320, 240);
 
-    // Grow or shrink the tree based on mic volume
     if (detections.length > 0) {
         if (currentLen < maxLen) {
             let growthRate = map(vol, 0, 100, 0.05, 0.1);  
@@ -115,14 +114,13 @@ function branch(len) {
         branch(len * random(0.7, 0.9));
     }
 
-    // Changing the color of leaves based on the number of detected faces
     if (leavesAppeared && len < maxLen && len <= 10) {
         if (detections.length === 2) {
-            fill(255, 25, 0, 150);  // Red leaves for 2 faces
+            fill(255, 25, 0, 150);
         } else if (detections.length === 1) {
-            fill(0, 255, 0, 150);  // Green leaves for 1 face
+            fill(0, 255, 0, 150);
         } else if (detections.length === 3) {
-            fill(255, 163, 221);  // Pink leaves for 3 faces
+            fill(255, 163, 221);
         } 
         noStroke();
 

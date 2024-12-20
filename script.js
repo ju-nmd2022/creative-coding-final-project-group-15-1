@@ -1,5 +1,6 @@
-//The logic behind the visual system is implemented from https://youtu.be/-3HwUKsovBE?si=XKVmyXNl04A2dKCN
+ //The logic behind the visual system is implemented from https://youtu.be/-3HwUKsovBE?si=XKVmyXNl04A2dKCN
 //The logic behind the face detecion system is implemented from https://www.geeksforgeeks.org/how-to-implement-face-detection-with-ml5js/ 
+
 let detections = [];
 let video;
 let mic;
@@ -7,6 +8,7 @@ let started = false;
 let maxLen = 100;
 let currentLen = 0;
 let leavesAppeared = false;
+let hearts = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -52,56 +54,77 @@ function gotFaces(error, result) {
 
   detections = result;
   faceapi.detect(gotFaces);
+
+  if (detections.length > 0) {
+    detections.forEach((detection) => {
+      if (detection.expressions) {
+        let emotions = Object.entries(detection.expressions);
+        emotions.forEach(([emotion, confidence]) => {
+          if (confidence > 0.2) {
+            let heartColor = getEmotionColor(emotion);
+            let x = random(width);
+            let y = random(height);
+            hearts.push(new Heart(x, y, heartColor));
+          }
+        });
+      }
+    });
+  }
 }
 
 function draw() {
-    let vol = 0;
-    if (started) {
-        vol = mic.getLevel() * 500;
+  let vol = 0;
+  if (started) {
+    vol = mic.getLevel() * 500;
+  }
+
+  let baseColor;
+  if (detections.length === 2) {
+    baseColor = color(255, 234, 174);
+    leavesAppeared = true;
+  } else if (detections.length === 1) {
+    baseColor = color(171, 199, 152);
+    leavesAppeared = true;
+  } else if (detections.length === 3) {
+    baseColor = color(251, 220, 226);
+    leavesAppeared = true;
+  } else {
+    baseColor = color(255);
+    leavesAppeared = false;
+  }
+
+  let darkness = map(vol, 0, 100, 0, 100);
+  let bgColor = lerpColor(baseColor, color(0), darkness / 100);
+  background(bgColor);
+
+  image(video, width - 320, height - 240, 320, 240);
+
+  if (detections.length > 0) {
+    if (currentLen < maxLen) {
+      let growthRate = map(vol, 0, 100, 0.05, 0.1);
+      currentLen += growthRate;
     }
-
-    let baseColor;
-    if (detections.length === 2) {
-        baseColor = color(255, 234, 174);
-        leavesAppeared = true;
-    } else if (detections.length === 1) {
-        baseColor = color(171, 199, 152);
-        leavesAppeared = true;
-    } else if (detections.length === 3) {
-        baseColor = color(251, 220, 226);
-        leavesAppeared = true;
-    } else {
-        baseColor = color(255);
-        leavesAppeared = false;
+  } else {
+    if (currentLen > 0) {
+      currentLen -= 0.1;
     }
-  
+  }
 
-    let darkness = map(vol, 0, 100, 0, 100);
-    let bgColor = lerpColor(baseColor, color(0), darkness / 100);
-    background(bgColor);
+  randomSeed(6);
+  translate(width / 2, height / 2 + 200);
+  branch(currentLen);
 
-    image(video, width - 320, height - 240, 320, 240);
-
-    if (detections.length > 0) {
-        if (currentLen < maxLen) {
-            let growthRate = map(vol, 0, 100, 0.05, 0.1);  
-            currentLen += growthRate;  
-        }
-    } else {
-        if (currentLen > 0) {
-            currentLen -= 0.1; 
-        }
+  if (currentLen > 30) {
+    leavesAppeared = true;
+  }
+  for (let i = hearts.length - 1; i >= 0; i--) {
+    hearts[i].draw();
+    hearts[i].update();
+    if (hearts[i].isOffScreen()) {
+      hearts.splice(i, 1);
     }
-
-    randomSeed(6);
-    translate(width / 2, height / 2 + 200);
-    branch(currentLen);  
-
-    if (currentLen > 30) {
-        leavesAppeared = true;
-    }
+  }
 }
-
 
 function branch(len) {
   push();
@@ -147,4 +170,48 @@ function branch(len) {
   pop();
 }
 
+class Heart {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.size = random(20, 40);
+    this.speed = random(1, 3);
+  }
+
+  draw() {
+    fill(this.color);
+    noStroke();
+    beginShape();
+    vertex(this.x, this.y);
+    bezierVertex(this.x - this.size / 2, this.y - this.size / 2, this.x - this.size, this.y + this.size / 3, this.x, this.y + this.size);
+    bezierVertex(this.x + this.size, this.y + this.size / 3, this.x + this.size / 2, this.y - this.size / 2, this.x, this.y);
+    endShape(CLOSE);
+  }
+
+  update() {
+    this.y -= this.speed;
+  }
+
+  isOffScreen() {
+    return this.y < -this.size;
+  }
+}
+
+function getEmotionColor(emotion) {
+  switch (emotion) {
+    case "happy":
+      return color(random(200, 255), random(200, 255), random(0, 50));
+    case "sad":
+      return color(random(0, 50), random(0, 50), random(200, 255));
+    case "angry":
+      return color(random(200, 255), random(0, 50), random(0, 50));
+    case "surprised":
+      return color(random(0, 50), random(200, 255), random(0, 50));
+    case "neutral":
+      return color(random(200, 255), random(200, 255), random(200, 255));
+    default:
+      return color(255);
+  }
+}
 

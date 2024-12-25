@@ -1,5 +1,5 @@
- //The logic behind the visual system is implemented from https://youtu.be/-3HwUKsovBE?si=XKVmyXNl04A2dKCN
-//The logic behind the face detecion system is implemented from https://www.geeksforgeeks.org/how-to-implement-face-detection-with-ml5js/ 
+//The logic behind the visual system is implemented from https://youtu.be/-3HwUKsovBE?si=XKVmyXNl04A2dKCN
+//The logic behind the face detection system is implemented from https://www.geeksforgeeks.org/how-to-implement-face-detection-with-ml5js/ 
 
 let detections = [];
 let video;
@@ -63,7 +63,7 @@ function gotFaces(error, result) {
           if (confidence > 0.2) {
             let heartColor = getEmotionColor(emotion);
             let x = random(width);
-            let y = random(height);
+            let y = height;
             hearts.push(new Heart(x, y, heartColor));
           }
         });
@@ -97,26 +97,25 @@ function draw() {
   let bgColor = lerpColor(baseColor, color(0), darkness / 100);
   background(bgColor);
 
-  image(video, width - 320, height - 240, 320, 240);
-
-  if (detections.length > 0) {
-    if (currentLen < maxLen) {
-      let growthRate = map(vol, 0, 100, 0.05, 0.1);
-      currentLen += growthRate;
-    }
-  } else {
-    if (currentLen > 0) {
-      currentLen -= 0.1;
-    }
+  if (detections.length > 0 && currentLen < maxLen) {
+    let growthRate = map(vol, 0, 100, 0.05, 0.5);
+    currentLen += growthRate;
+  } else if (currentLen > 0) {
+    currentLen -= 0.1;
   }
 
+  image(video, width - 320, height - 240, 320, 240);
+
   randomSeed(6);
-  translate(width / 2, height / 2 + 200);
+  push();
+  translate(width / 2, height - 100);
   branch(currentLen);
+  pop();
 
   if (currentLen > 30) {
     leavesAppeared = true;
   }
+
   for (let i = hearts.length - 1; i >= 0; i--) {
     hearts[i].draw();
     hearts[i].update();
@@ -214,4 +213,3 @@ function getEmotionColor(emotion) {
       return color(255);
   }
 }
-
